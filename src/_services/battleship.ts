@@ -40,7 +40,6 @@ export class Battleship {
                 this.grid.push(cell);
             }
         }
-        console.log(this.grid);
     }
 
     createShip(name: string, size: number, shipOrientation: shipOrientation): Ship {
@@ -62,69 +61,120 @@ export class Battleship {
         
         // inside boundary?
         const insideBoundary = this.isInsideBoard(ship, cell);
+        console.log("insideBoundary ", insideBoundary);
         if(!insideBoundary) return false;
 
         // any collision?
         const collision = this.isColliding(ship, cell);
+        console.log("collision", collision);
         if(collision) return false;
+
+        cell.isTaken = true;
 
         return isValidPlacement;
     }
 
+    /**
+     * Is Inside Board
+     * This will interpolate the last cell address and check if exists.
+     * @param ship 
+     * @param cell 
+     * @returns boolean
+     */
     isInsideBoard(ship: Ship, cell: Cell) : boolean {
 
-        if(cell == undefined) return false;
+        if(cell === undefined) return false;
+
+        let lastCell: Cell | undefined;
 
         if(ship.shipOrientation === shipOrientation.Horizontal){
-            console.log("X - ship total length", cell.gridCol + ship.shipLength)
-            console.log("board boundary", this.cols);
-            if(cell.gridCol + ship.shipLength > this.cols) return false;
+            let lastCellCol = cell.gridCol + ship.shipLength;
+            lastCell = this.getGridCell(cell.gridRow, lastCellCol);
         }
 
         if(ship.shipOrientation === shipOrientation.Vertical){
-            console.log("Y - ship total length", cell.gridCol + ship.shipLength)
-            console.log("board boundary", this.cols);
-            if(cell.gridRow + ship.shipLength > this.rows) return false;
+            let lastCellRow = cell.gridRow + ship.shipLength;
+            lastCell = this.getGridCell(lastCellRow, cell.gridCol);
         }
 
-        return true;
+        return (lastCell) ? true : false;
     }
 
+    /**
+     * Is Colliding
+     * This will iterate the ship's cell address and check if it's not yet taken. 
+     * @param ship ship type
+     * @param cell starting cell address
+     * @returns boolean
+     */
     isColliding(ship: Ship, cell: Cell) : boolean {
-        // check cell start cell;
-        // iterate ships positions 
+        
+        // interpolate cell address
+        let cellAddress = [];
+        let start = 0;
+        let end = 0;
+        let cellsInRange: Cell[] | undefined;
 
         // ship direction and translate to cell address
+
+        // get all the cells in the cell row
         if(ship.shipOrientation == shipOrientation.Horizontal){
-            // take cell column number and add length, check if outside the boundary
-        }else{
-            // take cell row number and add length, check if outside the boundary
+            start = cell.gridCol;
+            end = cell.gridCol + ship.shipLength;
+            cellsInRange =  this.getCellRange(start, end, ship.shipOrientation, cell.gridRow); 
+
+            console.log("rowCells",cellsInRange);
         }
 
-        // interpolate cell address
-        const cellAddress = [];
+        if(ship.shipOrientation == shipOrientation.Vertical){
+            start = cell.gridRow;
+            end = cell.gridRow + ship.shipLength;
+            cellsInRange =  this.getCellRange(start, end, ship.shipOrientation, cell.gridCol); 
 
-        if(ship.shipOrientation === shipOrientation.Horizontal){
-            for(let c=cell.gridCol; c < cell.gridRow + ship.shipLength; c++ ){
-                cellAddress.push(c);
-            }
+            console.log("colCells",cellsInRange);
         }
 
-        if(ship.shipOrientation === shipOrientation.Vertical){
-            for(let r=cell.gridCol; r < cell.gridRow + ship.shipLength; r++ ){
-                cellAddress.push(r);
-            }
+        if(cellsInRange){
+            return (cellsInRange.filter(c => c.isTaken)?.length > 0);
         }
-
-        console.log('ship cell address', cellAddress);
-
-    
-        let shipCollition = this.shipsPostition.filter(ship => {
-    //        ship.cells.find()
-        });
-
         return false;
     }
+
+
+    /**
+     * GetCellRange
+     * This will return a array of Cells.
+     * @param start  start of range
+     * @param end  end of range, this will deducted by 1 offset to match the array index.
+     * @param direction Horizontal or Vertical
+     * @param reference If direction is Horizontal, row index must be provided. 
+     *                  If direction is Vertical, column index must be prived.
+     * @returns array of cells
+     */
+    getCellRange(start: number, end: number, direction: shipOrientation, reference: number)  : Cell[] | undefined {
+        // add  index offset
+        end--;
+        
+         // get all cells in the row
+        if(direction == shipOrientation.Horizontal){
+            return this.grid.filter(
+                                c => c.gridRow == reference 
+                                && c.gridCol >= start 
+                                && c.gridCol <= end
+                            );
+        }
+
+        // get all cells in the column
+        if(direction == shipOrientation.Vertical){
+            return this.grid.filter(
+                                c => c.gridCol == reference 
+                                && c.gridRow >= start
+                                && c.gridRow <= end
+                            );
+        }
+
+    }
+    
 
     /**
      * Is Cell Takem

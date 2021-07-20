@@ -5,7 +5,11 @@ const game = new Battleship(5,5);
 
 game.startGame();
 
-const ship1 = game.createShip("ragnarok", 5, shipOrientation.Horizontal);
+const ship1 = game.createShip("ragnarok1", 5, shipOrientation.Horizontal);
+const ship2 = game.createShip("ragnarok2", 4, shipOrientation.Vertical);
 
-console.log( "isva;id? ", game.placeShip(ship1, 1, 0));
+console.log( "isvalid? ", game.placeShip(ship1, 0, 0));
+console.log( "isvalid? ", game.placeShip(ship1, 0, 0));
+console.log("=======================================")
+console.log( "isvalid? ", game.placeShip(ship2, 1, 0));
 

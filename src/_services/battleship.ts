@@ -1,5 +1,5 @@
 import { Cell } from "../_models/cell";
-import { Ship, shipOrientation } from "../_entities/ship";
+import { Ship, shipOrientation } from "../ship";
 
 export class Battleship {
     rows: number;

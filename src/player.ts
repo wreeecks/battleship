@@ -1,6 +1,6 @@
 import { Board } from "./Board";
 import { Ship } from "./ship";
-import { Cell } from "./cell";
+import { Cell } from './_models/cell';
 
 export class Player {
     name: string;

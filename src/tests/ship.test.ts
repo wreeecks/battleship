@@ -1,6 +1,6 @@
 import { Board } from '../board';
 import { Ship } from '../ship';
-import { Cell } from '../cell';
+import { Cell } from '../_models/cell';
 import { shipOrientation } from '../_models/enumShipOrientation';
 
 import { expect } from 'chai';

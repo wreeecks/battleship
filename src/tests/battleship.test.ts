@@ -1,7 +1,6 @@
 import { expect } from 'chai';
-import { exit } from 'process';
 import { Battleship } from '../battleship';
-import { Cell } from '../cell';
+import { Cell } from '../_models/cell';
 import { shipOrientation } from '../_models/enumShipOrientation';
 
 describe('Game Play', () => { 

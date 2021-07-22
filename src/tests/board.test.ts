@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { Board } from '../board';
-import { Cell } from '../cell';
+import { Cell } from '../_models/cell';
 
 describe('Test Board Size', () => { 
     it('Test default board size', () => { 

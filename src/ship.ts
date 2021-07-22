@@ -1,5 +1,5 @@
 import { Board } from "./Board";
-import { Cell } from "./cell";
+import { Cell } from './_models/cell';
 import { IShip } from "./_interfaces/IShip";
 import { shipOrientation } from "./_models/enumShipOrientation";
 

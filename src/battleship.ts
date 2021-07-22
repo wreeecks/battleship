@@ -1,4 +1,4 @@
-import { Cell } from "./cell";
+import { Cell } from './_models/cell';
 import { Player } from "./player";
 import { Ship } from "./ship";
 

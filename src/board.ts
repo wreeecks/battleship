@@ -1,4 +1,4 @@
-import { Cell } from "./cell";
+import { Cell } from './_models/cell';
 
 export class Board {
     private rows: number;

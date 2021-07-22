@@ -1,4 +1,4 @@
-import { Cell } from './_models/cell';
+import { Cell } from './models/cell';
 import { Player } from "./player";
 import { Ship } from "./ship";
 
@@ -7,25 +7,14 @@ export class Battleship {
     cols: number = 10;
     player1!: Player;
     player2!: Player;
-    winner?: Player;
-
-    ships: any[] = [ 
-        // {name: "Carrier", size: 5},
-        // {name: "Battleship", size: 3},
-        {name: "Submarine", size: 3},
-        {name: "Patrol Boat", size: 5}
-    ];  
-
-    shipObj: Ship[] = [
-        new Ship("banka", 1),
-        new Ship("salbabida"), 
-        new Ship("udo", 3)
+    ships: Ship[] = [
+       new Ship("Carrier",  3),
+       new Ship("Battleship",  5)
     ];
-        
 
-    constructor(rows?: number, cols?: number, fleets?: Ship[]) {
+    constructor(rows?: number, cols?: number, ships?: Ship[]) {
         this.setBoardSize(rows, cols);
-        this.setGameShipUnits(fleets);
+        this.setGameShipUnits(ships);
     }
 
     setBoardSize(rows?: number, cols?: number) : void {
@@ -42,24 +31,24 @@ export class Battleship {
     }
 
     start(){
-        this.winner = undefined;
         this.player1 = this.createPlayer("Player 1");
         this.player2 = this.createPlayer("Player 2");
     }
 
-    convertShipsToShipObj() : Ship[]{
+    /**
+     * Creates a new ship object to be assigned to player's board.
+     * @returns array of ships
+     */
+    getShipsObject() : Ship[]{
         const arrayShipObj = [];
-        this.ships.forEach(ship => {
-            arrayShipObj.push( new Ship(ship.name, ship.size));
-            }
-        );
+        this.ships.forEach(ship => arrayShipObj.push(new Ship(ship.name, ship.shipLength)));
         return arrayShipObj;
     }
 
     createPlayer(name: string) : Player {
         const player = new Player(name);
         player.setGameBoard(this.rows, this.cols);
-        player.setPlayableFleets(this.convertShipsToShipObj());
+        player.setPlayableFleets(this.getShipsObject());
         return player;
     }
 
@@ -75,11 +64,13 @@ export class Battleship {
 
     checkWinner(){
         if(!this.player1.hasRemainingShips()){
-            this.winner = this.player2;
+            return this.player2;
         }
 
         if(!this.player2.hasRemainingShips()){
-            this.winner = this.player1;
+            return this.player1;
         }
+
+        return null;
     }
 }

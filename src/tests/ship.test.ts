@@ -1,204 +1,200 @@
-import { Board } from '../board';
-import { Ship } from '../ship';
-import { Cell } from '../_models/cell';
-import { shipOrientation } from '../_models/enumShipOrientation';
+import { expect } from "chai";
+import { Board } from "../board";
+import { Ship } from "../ship";
+import { Cell } from "../models/cell";
+import { shipOrientation } from "../models/enumShipOrientation";
 
-import { expect } from 'chai';
+describe("Test Battleship Placements", () => {
 
-describe('Test Battleship Placements', () => { 
+	describe("Horizontal Battleship", () => {
 
-    describe('Horizontal Battleship', () => { 
+		it("Test set orientation to Horizontal", () => {
+			const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
+			battleship.setOrientation(shipOrientation.Horizontal);
 
-        it('Test set orientation to Horizontal', () => { 
-            const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
-            battleship.setOrientation(shipOrientation.Horizontal);
+			expect(battleship.shipOrientation).to.equal(shipOrientation.Horizontal);
+		});
 
-            expect(battleship.shipOrientation).to.equal(shipOrientation.Horizontal);
-        });
+		it("Test ship cell consumption - within boundary", () => {
+			const board = new Board();
+			const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
+			const startCell = new Cell(0,0);
+			const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
 
-        it('Test ship cell consumption - within boundary', () => { 
-            const board = new Board(); 
-            const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
-            const startCell = new Cell(0,0);
-            const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
-            
-            expect(shipBoardCells.length).to.equal(battleship.shipLength);
-        });
+			expect(shipBoardCells.length).to.equal(battleship.shipLength);
+		});
 
 
-        it('Test ship cell consumption - outside boundary', () => { 
-            const board = new Board(); 
-            const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
-            const startCell = new Cell(0,6);
-            
-            expect(() => battleship.getShipCellRangeOnBoard(board, startCell)).to.throw(Error, "out of board's range");
-        });
+		it("Test ship cell consumption - outside boundary", () => {
+			const board = new Board();
+			const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
+			const startCell = new Cell(0,6);
 
-        it('Test ship collistion - overlapping', () => { 
-            const board = new Board(); 
-            const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
-            const startCell = new Cell(0,0);
-            const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
+			expect(() => battleship.getShipCellRangeOnBoard(board, startCell)).to.throw(Error, "out of board's range");
+		});
 
-            board.occupyCell(shipBoardCells);
-            expect(shipBoardCells.filter(c => c.isInUse == false).length).to.equal(0);
+		it("Test ship collistion - overlapping", () => {
+			const board = new Board();
+			const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
+			const startCell = new Cell(0,0);
+			const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
 
-            const battleship2 = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
-            const startCell2 = new Cell(0,1);
-            const shipBoardCells2 = battleship2.getShipCellRangeOnBoard(board, startCell2);
+			board.occupyCell(shipBoardCells);
+			expect(shipBoardCells.filter(c => c.isInUse === false).length).to.equal(0);
 
-            // check collision
-            expect(board.hasCollision(shipBoardCells)).to.true;
+			const battleship2 = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
+			const startCell2 = new Cell(0,1);
+			const shipBoardCells2 = battleship2.getShipCellRangeOnBoard(board, startCell2);
 
-            // place ship with collision
-            expect(() => board.occupyCell(shipBoardCells2) ).to.throw("cell collision");
-        });
+			// check collision
+			expect(board.hasCollision(shipBoardCells)).to.equal(true);
 
-        it('Test place ship in the board', () => { 
-            const board = new Board(); 
-            const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
-            const startCell = new Cell(0,0);
-            const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
+			// place ship with collision
+			expect(() => board.occupyCell(shipBoardCells2) ).to.throw("cell collision");
+		});
 
-            board.occupyCell(shipBoardCells);
-            expect(shipBoardCells.filter(c => c.isInUse == false).length).to.equal(0);
-        });
-    });
+		it("Test place ship in the board", () => {
+			const board = new Board();
+			const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
+			const startCell = new Cell(0,0);
+			const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
 
-    describe('Vertical Battleship', () => { 
+			board.occupyCell(shipBoardCells);
+			expect(shipBoardCells.filter(c => c.isInUse === false).length).to.equal(0);
+		});
+	});
 
-        it('Test set orientation to Vertical', () => { 
-            const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
-            battleship.setOrientation(shipOrientation.Vertical);
-            expect(battleship.shipOrientation).to.equal(shipOrientation.Vertical);
-        });
+	describe("Vertical Battleship", () => {
 
-        it('Test ship cell consumption - within boundary', () => { 
-            const board = new Board(); 
-            const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
-            const startCell = new Cell(0,0);
-            const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
+		it("Test set orientation to Vertical", () => {
+			const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
+			battleship.setOrientation(shipOrientation.Vertical);
+			expect(battleship.shipOrientation).to.equal(shipOrientation.Vertical);
+		});
 
-            expect(shipBoardCells.length).to.equal(battleship.shipLength);
-        });
+		it("Test ship cell consumption - within boundary", () => {
+			const board = new Board();
+			const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
+			const startCell = new Cell(0,0);
+			const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
 
-        it('Test ship cell consumption - outside boundary', () => { 
-            const board = new Board(); 
-            const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
-            const startCell = new Cell(8,0);
-            
-            expect(() => battleship.getShipCellRangeOnBoard(board, startCell)).to.throw(Error, "out of board's range");
-        });
+			expect(shipBoardCells.length).to.equal(battleship.shipLength);
+		});
 
-        it('Test ship collistion - overlapping', () => { 
-            const board = new Board(); 
-            const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
-            const startCell = new Cell(0,0);
-            const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
+		it("Test ship cell consumption - outside boundary", () => {
+			const board = new Board();
+			const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
+			const startCell = new Cell(8,0);
 
-            board.occupyCell(shipBoardCells);
-            expect(shipBoardCells.filter(c => c.isInUse == false).length).to.equal(0);
+			expect(() => battleship.getShipCellRangeOnBoard(board, startCell)).to.throw(Error, "out of board's range");
+		});
 
-            const battleship2 = new Ship("battle cuiser", 5, shipOrientation.Vertical);
-            const startCell2 = new Cell(1,0);
-            const shipBoardCells2 = battleship2.getShipCellRangeOnBoard(board, startCell2);
+		it("Test ship collistion - overlapping", () => {
+			const board = new Board();
+			const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
+			const startCell = new Cell(0,0);
+			const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
 
-            // check collision
-            expect(board.hasCollision(shipBoardCells)).to.true;
+			board.occupyCell(shipBoardCells);
+			expect(shipBoardCells.filter(c => c.isInUse === false).length).to.equal(0);
 
-            // place ship with collision
-            expect(() => board.occupyCell(shipBoardCells2) ).to.throw("cell collision");
-        });
+			const battleship2 = new Ship("battle cuiser", 5, shipOrientation.Vertical);
+			const startCell2 = new Cell(1,0);
+			const shipBoardCells2 = battleship2.getShipCellRangeOnBoard(board, startCell2);
 
-        it('Test place ship in the board', () => { 
-            const board = new Board(); 
-            const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
-            const startCell = new Cell(0,0);
-            const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
-            
-            // check collision
-            expect(board.hasCollision(shipBoardCells)).to.false;
+			// check collision
+			expect(board.hasCollision(shipBoardCells)).to.equal(true);
 
-            board.occupyCell(shipBoardCells);
-            expect(shipBoardCells.filter(c => c.isInUse == false).length).to.equal(0);
-        });
-    });
+			// place ship with collision
+			expect(() => board.occupyCell(shipBoardCells2) ).to.throw("cell collision");
+		});
 
-    
+		it("Test place ship in the board", () => {
+			const board = new Board();
+			const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
+			const startCell = new Cell(0,0);
+			const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
 
+			// check collision
+			expect(board.hasCollision(shipBoardCells)).to.equal(true);
+
+			board.occupyCell(shipBoardCells);
+			expect(shipBoardCells.filter(c => c.isInUse === false).length).to.equal(0);
+		});
+	});
 });
 
-describe('Test Attack', () => { 
+describe("Test Attack", () => {
 
-    it('Attack horizontal battleship - HIT', () => { 
-        const board = new Board(); 
-        const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
-        const startCell = new Cell(0,0);
-        const targetCell = new Cell(0,1);
-        const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
+	it("Attack horizontal battleship - HIT", () => {
+		const board = new Board();
+		const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
+		const startCell = new Cell(0,0);
+		const targetCell = new Cell(0,1);
+		const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
 
-        // place ship
-        board.occupyCell(shipBoardCells);
+		// place ship
+		board.occupyCell(shipBoardCells);
 
-        // check targetCell
-        expect(board.isCellInUse(targetCell)).to.equal(true);
+		// check targetCell
+		expect(board.isCellInUse(targetCell)).to.equal(true);
 
-        // attack ship cell
-        board.tickCell(targetCell);
+		// attack ship cell
+		board.tickCell(targetCell);
 
-        expect(board.isHit(targetCell)).to.equal(true);
-    });
+		expect(board.isHit(targetCell)).to.equal(true);
+	});
 
-    it('Attack horizontal battleship - MISS', () => { 
-        const board = new Board(); 
-        const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
-        const startCell = new Cell(0,0);
-        const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
-        const targetCell = new Cell(0,5);
+	it("Attack horizontal battleship - MISS", () => {
+		const board = new Board();
+		const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
+		const startCell = new Cell(0,0);
+		const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
+		const targetCell = new Cell(0,5);
 
-        // place ship
-        board.occupyCell(shipBoardCells);
+		// place ship
+		board.occupyCell(shipBoardCells);
 
-        // attack ship cell
-        board.tickCell(targetCell);
-    
-        expect(board.isHit(targetCell)).to.equal(false);
-    });
+		// attack ship cell
+		board.tickCell(targetCell);
 
-    it('Attack vertical battleship - HIT', () => { 
-        const board = new Board(); 
-        const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
-        const startCell = new Cell(0,0);
-        const targetCell = new Cell(1,0);
-        const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
+		expect(board.isHit(targetCell)).to.equal(false);
+	});
 
-        // place ship
-        board.occupyCell(shipBoardCells);
+	it("Attack vertical battleship - HIT", () => {
+		const board = new Board();
+		const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
+		const startCell = new Cell(0,0);
+		const targetCell = new Cell(1,0);
+		const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
 
-        // check targetCell
-        expect(board.isCellInUse(targetCell)).to.equal(true);
+		// place ship
+		board.occupyCell(shipBoardCells);
 
-        // attack ship cell
-        board.tickCell(targetCell);
+		// check targetCell
+		expect(board.isCellInUse(targetCell)).to.equal(true);
 
-        // result
-        expect(board.isHit(targetCell)).to.equal(true);
-    });
+		// attack ship cell
+		board.tickCell(targetCell);
 
-    it('Attack vertical battleship - MISS', () => { 
-        const board = new Board(); 
-        const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
-        const startCell = new Cell(0,0);
-        const targetCell = new Cell(5,0);
-        const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
+		// result
+		expect(board.isHit(targetCell)).to.equal(true);
+	});
 
-        // place ship
-        board.occupyCell(shipBoardCells);
+	it("Attack vertical battleship - MISS", () => {
+		const board = new Board();
+		const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
+		const startCell = new Cell(0,0);
+		const targetCell = new Cell(5,0);
+		const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
 
-        // attack ship cell
-        board.tickCell(targetCell);
-    
-        expect(board.isHit(targetCell)).to.equal(false);
-    });
+		// place ship
+		board.occupyCell(shipBoardCells);
+
+		// attack ship cell
+		board.tickCell(targetCell);
+
+		expect(board.isHit(targetCell)).to.equal(false);
+	});
 
 });

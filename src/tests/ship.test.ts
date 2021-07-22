@@ -116,7 +116,7 @@ describe("Test Battleship Placements", () => {
 			const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
 
 			// check collision
-			expect(board.hasCollision(shipBoardCells)).to.equal(true);
+			expect(board.hasCollision(shipBoardCells)).to.equal(false);
 
 			board.occupyCell(shipBoardCells);
 			expect(shipBoardCells.filter(c => c.isInUse === false).length).to.equal(0);

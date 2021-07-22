@@ -1,6 +1,5 @@
 import { Cell } from "./models/cell";
 
-
 export class Board {
   private rows: number;
   private cols: number;

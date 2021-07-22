@@ -1,72 +1,81 @@
-import { Board } from '../board';
-import { Ship } from '../ship';
+import { expect } from 'chai';
+import { exit } from 'process';
+import { Battleship } from '../battleship';
 import { Cell } from '../cell';
 import { shipOrientation } from '../_models/enumShipOrientation';
 
-import { expect } from 'chai';
+describe('Game Play', () => { 
 
-describe('Test Horizontal Battleship on Board', () => { 
+    const bs = new Battleship();
+    bs.start();
 
-    it('Test battleship orientation - set to Horizontal', () => { 
-        const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
-        battleship.setOrientation(shipOrientation.Horizontal);
-        expect(battleship.shipOrientation).to.equal(shipOrientation.Horizontal);
-    });
+    // player 1 - assign ship position
+    const player1 = bs.player1;
+    const player2 = bs.player2;
+    
+    const player1Ships = player1.getShips();
+    const player2Ships = player2.getShips();
 
-    it('Test horizontal battleship within board', () => { 
-        const board = new Board(); 
-        const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
-        const startCell = new Cell(0,0);
-        const shipBoardCells = board.getHorizontalCellRange(startCell, battleship.shipLength);
+    // change orientation
+    player2Ships[0].setOrientation(shipOrientation.Vertical);
 
-        expect(shipBoardCells.length).to.equal(battleship.shipLength);
-    });
+    // position ships
+    bs.placeShip(player1, player1Ships[0],  new Cell(0,0));
+    bs.placeShip(player1, player1Ships[1],  new Cell(1,0));
 
+    bs.placeShip(player2, player2Ships[0],  new Cell(4,0));
+    bs.placeShip(player2, player2Ships[1],  new Cell(0,1));
 
-    it('Test horizontal battleship out of bound', () => { 
-        const board = new Board(); 
-        const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
-        const startCell = new Cell(0,6);
+    it('Player 2 attacks Player 1 ship (orientation: horizontal, size 3)', () => { 
+       
+        // p2 hits p1 ship
+        expect(bs.attackPlayer(player2, player1, new Cell(0,0))).to.true;
         
-        expect(() => board.getHorizontalCellRange(startCell, battleship.shipLength)).to.throw(Error, "out of board's range");
-    });
-
-    it('Place horizontal battleship in the board', () => { 
-        const board = new Board(); 
-        const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
-        const startCell = new Cell(0,0);
-        const shipBoardCells = board.getHorizontalCellRange(startCell, battleship.shipLength);
-
-
-        expect(shipBoardCells.length).to.equal(battleship.shipLength);
-    });
-
-});
-
-
-describe('Test Vetical Battleship on Board', () => { 
-
-    it('Test battleship orientation - set to Vertical', () => { 
-        const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
-        battleship.setOrientation(shipOrientation.Vertical);
-        expect(battleship.shipOrientation).to.equal(shipOrientation.Vertical);
-    });
-
-    it('Test vertical battleship within board', () => { 
-        const board = new Board(); 
-        const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
-        const startCell = new Cell(0,0);
-        const shipBoardCells = board.getVerticalCellRange(startCell, battleship.shipLength);
-
-        expect(shipBoardCells.length).to.equal(battleship.shipLength);
-    });
-
-
-    it('Test vertical battleship out of bound', () => { 
-        const board = new Board(); 
-        const battleship = new Ship("battle cuiser", 5, shipOrientation.Vertical);
-        const startCell = new Cell(6,0);
+        // ship damaged but not yet destroyed
+        expect(player2Ships[0].isDestroyed).to.false;
         
-        expect(() => board.getVerticalCellRange(startCell, battleship.shipLength)).to.throw(Error, "out of board's range");
+        // p2 hits ship 
+        expect(bs.attackPlayer(player2, player1, new Cell(0,1))).to.true;
+
+        // damaged but not yet destroyed
+        expect(player2Ships[0].isDestroyed).to.false;
+
+        // p2 hits ship 
+        expect(bs.attackPlayer(player2, player1, new Cell(0,2))).to.true;
+
+        // ship destroyed
+        expect(player1Ships[0].isDestroyed).to.true;
+
+        // no winner
+        expect(bs.winner).to.undefined;
+
+        // p1 has remaining
+        expect(player1.hasRemainingShips()).to.true;        
+    });
+
+
+    it('Player 2 Wins - destroys all player 1 ships', () => { 
+       
+        // p2 hits and sinks ship 2 
+        expect(bs.attackPlayer(player2, player1, new Cell(1,0))).to.true;
+        expect(bs.attackPlayer(player2, player1, new Cell(1,1))).to.true;
+        expect(bs.attackPlayer(player2, player1, new Cell(1,2))).to.true;
+        expect(bs.attackPlayer(player2, player1, new Cell(1,3))).to.true;
+        expect(bs.attackPlayer(player2, player1, new Cell(1,4))).to.true;
+
+        // ship 1 destroyed
+        expect(player1Ships[1].isDestroyed).to.true;
+
+        // p1 no remaining ship
+        expect(player1.hasRemainingShips()).to.false;
+
+        // has winner
+        expect(bs.winner.name).to.equal(player2.name);
+
+        console.log('Player1 Board')
+        player1.getBoard().displayGrid();
+
+        console.log('Player2 Board')
+        player2.getBoard().displayGrid();
     });
 });

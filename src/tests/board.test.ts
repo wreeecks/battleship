@@ -1,10 +1,6 @@
-import { Board } from '../board';
-import { Ship } from '../ship';
-import { Cell } from '../cell';
-import { shipOrientation } from '../_models/enumShipOrientation';
-
 import { expect } from 'chai';
-
+import { Board } from '../board';
+import { Cell } from '../cell';
 
 describe('Test Board Size', () => { 
     it('Test default board size', () => { 
@@ -37,5 +33,27 @@ describe('Test Board Size', () => {
 
     it('Test 0 row and 0 column board size', () => { 
         expect(() => new Board(0, 0)).to.throws( "row and column size must be more than 0");
+    });
+});
+
+describe('Test Board Actions', () => {
+    it('Test tick cell', () => { 
+        const board = new Board();
+        const cell = new Cell(0,0);
+
+        expect(board.isCellTicked(cell)).to.equal(false);
+
+        board.tickCell(cell);
+        expect(board.isCellTicked(cell)).to.equal(true);
+    });
+
+    it('Test double tick cell', () => { 
+        const board = new Board();
+        const cell = new Cell(0,0);
+
+        board.tickCell(cell);
+        expect(board.isCellTicked(cell)).to.equal(true);
+
+        expect(() => board.tickCell(cell)).to.throw("cell is already ticked");
     });
 });

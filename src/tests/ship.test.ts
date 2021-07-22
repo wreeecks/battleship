@@ -137,7 +137,7 @@ describe("Test Attack", () => {
 		board.occupyCell(shipBoardCells);
 
 		// check targetCell
-		expect(board.isCellInUse(targetCell)).to.equal(true);
+		expect(board.isOccupied(targetCell)).to.equal(true);
 
 		// attack ship cell
 		board.tickCell(targetCell);
@@ -172,7 +172,7 @@ describe("Test Attack", () => {
 		board.occupyCell(shipBoardCells);
 
 		// check targetCell
-		expect(board.isCellInUse(targetCell)).to.equal(true);
+		expect(board.isOccupied(targetCell)).to.equal(true);
 
 		// attack ship cell
 		board.tickCell(targetCell);

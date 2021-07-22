@@ -21,8 +21,7 @@ describe('Test Battleship Placements', () => {
             const battleship = new Ship("battle cuiser", 5, shipOrientation.Horizontal);
             const startCell = new Cell(0,0);
             const shipBoardCells = battleship.getShipCellRangeOnBoard(board, startCell);
-            console.table(shipBoardCells)
-
+            
             expect(shipBoardCells.length).to.equal(battleship.shipLength);
         });
 

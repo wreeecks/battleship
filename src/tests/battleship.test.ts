@@ -72,10 +72,5 @@ describe('Game Play', () => {
         // has winner
         expect(bs.winner.name).to.equal(player2.name);
 
-        console.log('Player1 Board')
-        player1.getBoard().displayGrid();
-
-        console.log('Player2 Board')
-        player2.getBoard().displayGrid();
     });
 });

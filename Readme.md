@@ -1,4 +1,4 @@
-#BATTLESHIP GAME
+# BATTLESHIP GAME
 
 Based on the classic game “Battleship”.
 
@@ -14,8 +14,9 @@ and the opponent must respond by either reporting a “hit” on one of their ba
 * A player wins if all of their opponent’s battleships have been sunk.
 
 
-#Requirements
+# Requirements
 
+* NodeJS v14.17.3
 * nodemon
 * ts-node
 * typescript
@@ -25,7 +26,7 @@ and the opponent must respond by either reporting a “hit” on one of their ba
 * mocha
 
 
-#How to run locally
+# How to run test locally
 
 * clone the repo
 * `cd flare`

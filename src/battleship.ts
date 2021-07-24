@@ -1,12 +1,12 @@
 import { Cell } from "./models/cell";
-import { Player2 } from "./player";
+import { Player } from "./player";
 import { Ship } from "./ship";
 
-export class Battleship2 {
+export class Battleship {
     rows: number = 10;
     cols: number = 10;
-    player1!: Player2;
-    player2!: Player2;
+    player1!: Player;
+    player2!: Player;
     shipsUnits: Ship[] = [
        new Ship("Carrier",  3),
        new Ship("Battleship",  5)
@@ -50,10 +50,10 @@ export class Battleship2 {
      * @param name name of the player
      * @returns Player Object
      */
-    createPlayer(name: string) : Player2 {
-        const player = new Player2(name);
+    createPlayer(name: string) : Player {
+        const player = new Player(name);
         player.setGameBoard(this.rows, this.cols);
-        player.setPlayableFleets(this.getShipsObject());
+        player.setPlayableUnits(this.getShipsObject());
         return player;
     }
 
@@ -63,7 +63,7 @@ export class Battleship2 {
      * @param ship 
      * @param cell 
      */
-    placeShip(player: Player2, ship: Ship, cell: Cell){
+    placeShip(player: Player, ship: Ship, cell: Cell){
         player.placeShip(ship,cell);
     }
 
@@ -74,7 +74,7 @@ export class Battleship2 {
      * @param cell the target cell
      * @returns boolean returns true if a ship is hit.
      */
-    attackPlayer(activePlayer: Player2, targetPlayer: Player2, cell: Cell): boolean {
+    attackPlayer(activePlayer: Player, targetPlayer: Player, cell: Cell): boolean {
         const isHit = activePlayer.attack(targetPlayer, cell);
         if(isHit) this.checkWinner();
         return isHit;

@@ -1,10 +1,10 @@
 import { expect } from 'chai';
-import { Battleship2 } from '../battleship2';
+import { Battleship } from '../battleship';
 import { Cell, Direction } from '../models/cell';
 
 describe('Game Play', () => {
 
-    const bs = new Battleship2();
+    const bs = new Battleship();
     bs.start();
 
     // player 1 - assign ship position

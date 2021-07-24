@@ -29,6 +29,6 @@ and the opponent must respond by either reporting a “hit” on one of their ba
 # How to run test locally
 
 * clone the repo `git clone https://github.com/wreeecks/battleship.git`
-* change dir `cd battleship`
-* run `npm install`
-* run test `npm run test`
+* change dir to battleship `cd battleship`
+* install npm packages `npm install`
+* run mocha test scripts `npm run test`

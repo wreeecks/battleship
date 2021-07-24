@@ -13,14 +13,26 @@ export class Ship {
         this.shipOrientation = orientation;
     }
 
+    /**
+     * 
+     * @returns ship's length
+     */
     getShipLength(): number {
         return this.shipLength;
     }
 
+    /**
+     * sets ship position
+     * @param cellRange 
+     */
     setShipPosition(cellRange: Cell[]): void {
         this.shipPosition = cellRange;
     }
 
+    /**
+     * 
+     * @returns ship position
+     */
     getShipPosition(): Cell[] {
         return this.shipPosition;
     }
@@ -29,10 +41,18 @@ export class Ship {
         this.shipOrientation = orientation;
     }
 
+    /**
+     * 
+     * @returns Ship's orientation or direction
+     */
     getOrientation(): Direction {
         return this.shipOrientation;
     }
 
+    /**
+     * set the damage on player's ship
+     * @param cell 
+     */
     setShipDamage(cell: Cell): void {
         
         const ship = this.shipPosition.find(c => c.gridRow === cell.gridRow && c.gridCol === cell.gridCol);
@@ -49,15 +69,14 @@ export class Ship {
                 console.log(`${this.name} sunked`);
             }    
         }
-
     }
 
     /**
-     * Checks if there are remaining occupied cells
+     * Check if all the cell ship is hit
      * @returns boolean 
      */
     isDestroyed(): boolean {
-        return (this.shipPosition.filter(c => c.cellState === CellState.Occupied).length === 0);
+        return this.shipPosition.filter(c => c.cellState !== CellState.Hit).length === 0;
     }
 
     /**

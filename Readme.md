@@ -17,9 +17,9 @@ and the opponent must respond by either reporting a “hit” on one of their ba
 # Requirements
 
 * NodeJS v14.17.3
+* Typescript  4.3.5
 * nodemon
 * ts-node
-* typescript
 * @types/chai
 * @types/mocha
 * chai
@@ -28,7 +28,7 @@ and the opponent must respond by either reporting a “hit” on one of their ba
 
 # How to run test locally
 
-* clone the repo
-* `cd flare`
+* clone the repo `git clone https://github.com/wreeecks/battleship.git`
+* change dir `cd battleship`
 * run `npm install`
 * run test `npm run test`

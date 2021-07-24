@@ -1,11 +1,11 @@
-import { Board } from "./Board";
+import { Board } from "./board";
 import { Ship } from "./ship";
-import { Cell } from './models/cell';
+import { Cell, CellState } from './models/cell';
 
-export class Player {
+export class Player2 {
     name: string;
     private board!: Board;
-    private ships!: Ship[];
+    private shipUnits!: Ship[];
     private ready: boolean = false;
 
     constructor(name: string) {
@@ -16,8 +16,8 @@ export class Player {
         this.board = new Board(row, cols);
     }
 
-    setPlayableFleets(fleets: Ship[]) : void {
-        this.ships = fleets;
+    setPlayableFleets(shipUnits: Ship[]) : void {
+        this.shipUnits = shipUnits;
     }
 
     getBoard(){
@@ -25,7 +25,7 @@ export class Player {
     }
 
     getShips(){
-        return this.ships;
+        return this.shipUnits;
     }
 
     /**
@@ -35,30 +35,20 @@ export class Player {
      */
     placeShip(ship: Ship, cell: Cell) : void {
         const shipCellRange = ship.getShipCellRangeOnBoard(this.board, cell);
-        this.board.occupyCell(shipCellRange);
+        this.board.occupyCellRange(shipCellRange);
         ship.setShipPosition(shipCellRange);
-        this.checkIfReady();
+        this.isAllShipUnitsInPlace();
     }
 
     /**
-     * Remove ship off the board.
-     * @param ship
-     */
-    removeShip(ship: Ship) : void {
-        this.board.freeCell(ship.getShipPosition());
-    }
-
-    /**
-     * Check if all ships are in play.
+     * Check if all ships units are in place.
      * This will flag the user ready once all the ships are in place.
      * @returns
      */
-    checkIfReady(){
+    private isAllShipUnitsInPlace(): void {
         // find ships without cell position;
-        const ship = this.ships.filter(s => {
-            return s.getShipPosition().length === 0;
-        });
-        this.ready = !(ship.length > 0);
+        const remainingShips = this.shipUnits.filter(s => s.getShipPosition().length === 0 );
+        this.ready = !(remainingShips.length > 0);
     }
 
     isReady() : boolean {
@@ -71,30 +61,46 @@ export class Player {
      * @param cell Opponent's board cell
      * @returns boolean returns true if a ship is hit, otherwise false
      */
-    attack(opponent: Player, cell: Cell): boolean {
-        opponent.board.tickCell(cell);
-        return opponent.isHit(cell);
-    }
-
-    isHit(cell: Cell){
-        // check if cell matches any ship position
-        const damagedShip = this.ships.find(s => {
-            const cellAddressMatch = s.shipPosition.filter(c => c.gridRow === cell.gridRow && c.gridCol === cell.gridCol);
-            return (cellAddressMatch.length > 0);
-        });
-
-        if(damagedShip){
-            damagedShip.setShipDamage(cell);
-            return true;
+    attack(opponent: Player2, cell: Cell): boolean {
+        opponent.board.attackCell(cell);
+        
+        if(opponent.board.isCellState(cell, CellState.Hit)){
+            this.setShipDamage(opponent, cell);    
+            // tslint:disable-next-line:no-console
+            console.log("HIT!")        
+            return true;    
         }
 
         // tslint:disable-next-line:no-console
-        console.log("MISS!")
+        console.log("MISS!")  
         return false;
     }
 
+    /**
+     * returns the ship th
+     * @param cell 
+     * @returns 
+     */
+    private getShipByCell(player: Player2, cell: Cell): Ship {
+        return  player.getShips().find( s => {
+            return s.getShipPosition().find(p => p.gridRow === cell.gridRow && p.gridCol === cell.gridCol);
+        });
+    }
+
+    private setShipDamage(opponent: Player2, cell: Cell): void{
+        const damagedShip = this.getShipByCell(opponent, cell);
+        
+        if(damagedShip){
+            const damagedShipPosition = damagedShip.getShipPosition();
+            const damagedCell = damagedShipPosition.find(p => p.gridRow === cell.gridRow && p.gridCol === cell.gridCol);
+            damagedCell.cellState = CellState.Hit;
+        }       
+    }
+
     hasRemainingShips(){
-        const remainingShips = this.ships.filter(s => s.isDestroyed === false);
+        const remainingShips = this.shipUnits.filter(s => s.isDestroyed() === false);
+
+        //remainingShips.forEach(s => console.log(s.getShipPosition()));
         return (remainingShips.length !== 0);
     }
 

@@ -1,18 +1,18 @@
-import { Cell2 } from "./models/cell2";
-import { Player2 } from "./player2";
-import { Ship2 } from "./ship2";
+import { Cell } from "./models/cell";
+import { Player2 } from "./player";
+import { Ship } from "./ship";
 
 export class Battleship2 {
     rows: number = 10;
     cols: number = 10;
     player1!: Player2;
     player2!: Player2;
-    shipsUnits: Ship2[] = [
-       new Ship2("Carrier",  3),
-       new Ship2("Battleship",  5)
+    shipsUnits: Ship[] = [
+       new Ship("Carrier",  3),
+       new Ship("Battleship",  5)
     ];
 
-    constructor(rows?: number, cols?: number, shipsUnits?: Ship2[]) {
+    constructor(rows?: number, cols?: number, shipsUnits?: Ship[]) {
         this.setBoardSize(rows, cols);
         this.setGameShipUnits(shipsUnits);
     }
@@ -24,7 +24,7 @@ export class Battleship2 {
         }
     }
 
-    setGameShipUnits(shipsUnits?: Ship2[]) : void {
+    setGameShipUnits(shipsUnits?: Ship[]) : void {
         if(shipsUnits){
             this.shipsUnits = shipsUnits;
         }
@@ -39,9 +39,9 @@ export class Battleship2 {
      * Creates a new set of ship objects.
      * @returns array of ships objects
      */
-    getShipsObject() : Ship2[]{
+    getShipsObject(): Ship[]{
         const arrayShipObj = [];
-        this.shipsUnits.forEach(ship => arrayShipObj.push(new Ship2(ship.name, ship.getShipLength())));
+        this.shipsUnits.forEach(ship => arrayShipObj.push(new Ship(ship.name, ship.getShipLength())));
         return arrayShipObj;
     }
 
@@ -63,7 +63,7 @@ export class Battleship2 {
      * @param ship 
      * @param cell 
      */
-    placeShip(player: Player2, ship: Ship2, cell: Cell2){
+    placeShip(player: Player2, ship: Ship, cell: Cell){
         player.placeShip(ship,cell);
     }
 
@@ -74,7 +74,7 @@ export class Battleship2 {
      * @param cell the target cell
      * @returns boolean returns true if a ship is hit.
      */
-    attackPlayer(activePlayer: Player2, targetPlayer: Player2, cell: Cell2): boolean {
+    attackPlayer(activePlayer: Player2, targetPlayer: Player2, cell: Cell): boolean {
         const isHit = activePlayer.attack(targetPlayer, cell);
         if(isHit) this.checkWinner();
         return isHit;

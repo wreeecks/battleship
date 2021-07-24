@@ -1,116 +1,72 @@
-import { Board } from "./Board";
-import { Cell } from './models/cell';
-import { shipOrientation } from "./models/enumShipOrientation";
+import { Board } from "./board";
+import { Cell, CellState, Direction } from "./models/cell";
 
 export class Ship {
     name: string;
-    shipLength: number;
-    shipOrientation: shipOrientation ;
-    shipPosition: Cell[] = [];
-    shipDamage: Cell[] = [];
-    isDestroyed: boolean = false;
+    private shipLength: number;
+    private shipOrientation: Direction ;
+    private shipPosition: Cell[] = [];
 
-    constructor(name: string = "Rengoku", shipLength: number = 4, orientation: shipOrientation = shipOrientation.Horizontal) {
+    constructor(name: string = "Thousand Sunny", shipLength: number = 4, orientation: Direction = Direction.Horizontal) {
         this.name = name;
         this.shipLength = shipLength;
         this.shipOrientation = orientation;
     }
 
-    setShipPosition(cellRange: Cell[]) : void {
+    getShipLength(): number {
+        return this.shipLength;
+    }
+
+    setShipPosition(cellRange: Cell[]): void {
         this.shipPosition = cellRange;
     }
 
-    getShipPosition(){
+    getShipPosition(): Cell[] {
         return this.shipPosition;
     }
-
-    removeShipFromBoard(board: Board){
-        board.freeCell(this.getShipPosition());
-        this.setShipPosition([]);
-    }
-
-    setOrientation(orientation: shipOrientation){
+    
+    setOrientation(orientation: Direction): void {
         this.shipOrientation = orientation;
     }
 
-    setShipDamage(cell: Cell){
-        this.shipDamage.push(cell);
-        // tslint:disable-next-line:no-console
-        console.log("HIT!")
+    getOrientation(): Direction {
+        return this.shipOrientation;
+    }
 
-        if(this.shipPosition.length === this.shipDamage.length) {
-            this.isDestroyed = true;
+    setShipDamage(cell: Cell): void {
+        
+        const ship = this.shipPosition.find(c => c.gridRow === cell.gridRow && c.gridCol === cell.gridCol);
+        
+        if(!ship) throw("Unable to set damage.");
+
+        if(ship){
             // tslint:disable-next-line:no-console
-            console.log(`${this.name} destroyed!`);
+            console.log("HIT!")
+            ship.cellState = CellState.Hit;
+
+            if(this.isDestroyed()){
+                // tslint:disable-next-line:no-console
+                console.log(`${this.name} sunked`);
+            }    
         }
+
     }
 
     /**
-     * Returns  the ship cell consumption
+     * Checks if there are remaining occupied cells
+     * @returns boolean 
+     */
+    isDestroyed(): boolean {
+        return (this.shipPosition.filter(c => c.cellState === CellState.Occupied).length === 0);
+    }
+
+    /**
+     * Returns the ship cell consumption on the board
      * @param board target board
-     * @param startCell starting cell position
+     * @param startingPoint starting cell position
      * @returns array of the target board cells.
      */
-    getShipCellRangeOnBoard(board: Board, startCell: Cell) : Cell[] {
-        if(this.shipOrientation === shipOrientation.Horizontal){
-            return this.getHorizontalCellRange(board, startCell, this.shipLength);
-        }
-
-        if(this.shipOrientation === shipOrientation.Vertical){
-            return this.getVerticalCellRange(board, startCell, this.shipLength);
-        }
-    }
-
-    /**
-     * Returns board's array of cells from the startCell until the end of range.
-     *
-     * @param startCell  start of range
-     * @param numberOfCells  number of cells to return
-     * @returns array of cells
-     */
-    private getHorizontalCellRange(board: Board, startCell: Cell, numberOfCells: number) : Cell[] {
-
-        const grid = board.getGrid();
-        const rangeStart = startCell.gridCol;
-        const rangeEnd =  startCell.gridCol + (numberOfCells - 1);
-
-        const cells = grid.filter(
-                            c => c.gridRow === startCell.gridRow
-                            && c.gridCol >= rangeStart
-                            && c.gridCol <= rangeEnd
-                        );
-
-        if(cells.length !== numberOfCells) {
-            throw Error("out of board's range");
-        }
-
-        return cells;
-    }
-
-
-    /**
-     * Returns board's array of cells from the startCell until the end of range.
-     *
-     * @param board  target board
-     * @param startCell  start of range
-     * @param numberOfCells  number of cells to return
-     * @returns array of cells
-     */
-     private getVerticalCellRange(board: Board, startCell: Cell, numberOfCells: number): Cell[] {
-        const grid = board.getGrid();
-        const rangeStart = startCell.gridRow;
-        const rangeEnd =  startCell.gridRow + (numberOfCells - 1);
-
-        const cells = grid.filter(
-                            c => c.gridCol === startCell.gridCol
-                            && c.gridRow >= rangeStart
-                            && c.gridRow <= rangeEnd
-                        );
-
-        if(cells.length !== numberOfCells) {
-            throw Error("out of board's range");
-        }
-
-        return cells;
+    getShipCellRangeOnBoard(board: Board, startingPoint: Cell): Cell[] {
+        return board.getCellRangeAddress(this.shipOrientation, startingPoint, this.shipLength);
     }
 }

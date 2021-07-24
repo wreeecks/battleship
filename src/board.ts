@@ -1,178 +1,237 @@
-import { Cell } from "./models/cell";
+import { Cell, CellState, Direction } from "./models/cell";
 
 export class Board {
-	private rows: number;
-	private cols: number;
-	private grid: Cell[] = [];
+    private rows: number;
+    private cols: number;
+    private grid: CellState[][];
 
-	constructor(rows: number = 10, cols: number = 10) {
-		this.setBoardSize(rows, cols);
-		this.createBoard();
-	}
+    constructor(rows: number = 10, cols: number = 10) {
+        this.setBoardSize(rows, cols);
+        this.createBoard();
+    }
 
-	/**
-	 * Set Board Size
-	 * @param rows must be more than 0, defaults to 10.
-	 * @param cols must be more than 0, defaults to 10.
-	 */
-	setBoardSize(rows: number, cols: number): void {
-		if (rows <= 0 || cols <= 0)
-			throw Error("row and column size must be more than 0");
+    /**
+     * Set Board Size
+     * @param rows must be more than 0, defaults to 10.
+     * @param cols must be more than 0, defaults to 10.
+     */
+    private setBoardSize(rows: number, cols: number): void {
+        if (rows <= 0 || cols <= 0)
+            throw Error("Row and column size must be more than 0");
 
-		this.rows = rows;
-		this.cols = cols;
-	}
+        this.rows = rows;
+        this.cols = cols;
+    }
 
-	/**
-	 * Create Game Board
-	 * This will reset the grid
-	 */
-	createBoard(): void {
-		const totalRows = this.rows;
-		const totalCols = this.cols;
-		this.grid = []; // reset grid
+    /**
+     * Create Game Board
+     * This will reset the grid
+     */
+    private createBoard(): void {
+        const totalRows = this.rows;
+        const totalCols = this.cols;
+        this.grid = []; // reset grid
 
-		for (let rowIndex = 0; rowIndex < totalRows; rowIndex++) {
-			for (let colIndex = 0; colIndex < totalCols; colIndex++) {
-				const cell = new Cell(rowIndex, colIndex);
-				this.grid.push(cell);
-			}
-		}
-	}
+        for (let rowIndex = 0; rowIndex < totalRows; rowIndex++) {
+            const rowColumns = [];
 
-	/**
-	 * Get Board Grid
-	 * @returns array of cells
-	 */
-	getGrid(): Cell[] {
-		return this.grid;
-	}
+            for (let colIndex = 0; colIndex < totalCols; colIndex++) {
+                rowColumns.push(CellState.Open);
+            }
+            
+            this.grid.push(rowColumns);
+        }
+    }
 
-	/**
-	 * Get Total Board Rows
-	 * @returns number board's total number of rows
-	 */
-	getTotalRows(): number {
-		return this.rows;
-	}
 
-	/**
-	 * Get Total Cols
-	 * @returns number board's total number of columns
-	 */
-	getTotalCols(): number {
-		return this.cols;
-	}
+    /**
+     * Get Total Board Rows
+     * @returns number board's total number of rows
+     */
+    getTotalRows(): number {
+        return this.rows;
+    }
 
-	/**
-	 * Get Grid Cell
-	 * @param row Board row number
-	 * @param col Board column number
-	 * @returns Cell or undefined if not found.
-	 */
-	getGridCell(targetCell: Cell): Cell | undefined {
-		const cell = this.grid.find((c) => c.gridRow === targetCell.gridRow && c.gridCol === targetCell.gridCol);
+    /**
+     * Get Total Cols
+     * @returns number board's total number of columns
+     */
+    getTotalCols(): number {
+        return this.cols;
+    }
 
-		if (!cell) throw Error("cell not found");
+    private updateGrid(cellUpdate: Cell): void {
+        const targetCell = this.getGridCell(cellUpdate.gridRow, cellUpdate.gridCol);
+        
+        if(targetCell){
+            this.grid[targetCell.gridRow][targetCell.gridCol] = cellUpdate.cellState;
+        }
+    }
 
-		return cell;
-	}
+    /**
+     * If the cell exists, return cell with state.
+     * Otherwise, throw an error "Cell not found".
+     * 
+     * @param targetCell target cell
+     * @returns Cell
+     */
+     getGridCell(row: number, col: number): Cell {
+        
+        if( typeof this.grid[row] === 'undefined' || typeof this.grid[row][col] === 'undefined')  {
+            throw Error("Cell not found");
+        }
+        
+        return new Cell(row, col, this.grid[row][col]);
+    }
 
-	/**
-	 * Checks if any of the cell range is already taken
-	 * @param cellRange
-	 * @returns boolean
-	 */
-	hasCollision(cellRange: Cell[]): boolean {
-		return cellRange.filter((c) => c.isInUse)?.length > 0;
-	}
+    /**
+     * Returns the cell state
+     * @param row grid row
+     * @param col grid column
+     * @returns CellState
+     */
+     getCellState(row: number, col: number): CellState {
+        return this.getGridCell(row, col).cellState;
+    }
 
-	/**
-	 * Checks if the cell is in user
-	 * @param cellRange
-	 * @returns boolean
-	 */
-	isHit(targetCell: Cell): boolean {
-		return this.isOccupied(targetCell);
-	}
+    /**
+     * verify the cell state.
+     * @param cell target cell
+     * @param cellState the state to compare to
+     * @returns boolean
+     */
+    isCellState(cell: Cell, cellState: CellState): boolean {
+        return this.getCellState(cell.gridRow, cell.gridCol) === cellState;
+    }
 
-	/**
-	 * Checks if the cell address is already in use.
-	 * @param targetCell target cell
-	 * @returns boolean
-	 */
-	 isOccupied(targetCell: Cell): boolean {
-		const cell = this.getGridCell(targetCell);
-		return cell.isInUse;
-	}
+    /**
+     * set the cell status to occupied
+     * @param targetCell target cell
+     */
+     occupyCell(targetCell: Cell): void {
+        targetCell.cellState = CellState.Occupied;
+        this.updateGrid(targetCell);
+    }
 
-	/**
-	 * Used when the user guess a cell, flag the cell as "ticked".
-	 * @param row Board row number
-	 * @param col Board column number
-	 */
-	tickCell(targetCell: Cell): void {
-		const cell = this.getGridCell(targetCell);
+    /**
+     * set the state of the cells in the range to occupied
+     * @param cellRange 
+     */
+    occupyCellRange(cellRange: Cell[]): void{
+        if(this.hasCollision(cellRange)) throw Error("Collision detected.");
+        
+        cellRange.forEach( c => {
+            this.occupyCell(c);
+        });
+    }
+    
+    /**
+     * A wrapper to automaticall compute the address based on direction
+     * @param direction 
+     * @param startingPoint 
+     * @param numberOfCells 
+     * @returns array of cell with it's state
+     */
+    getCellRangeAddress(direction: Direction, startingPoint: Cell, numberOfCells: number): Cell[] {
+        if(direction === Direction.Horizontal){
+            return this.getHorizontalRange(startingPoint, numberOfCells);
+        }
 
-		if (cell.isTicked) throw Error("cell is already ticked");
+        if(direction === Direction.Vertical){
+            return this.getVerticalRange(startingPoint, numberOfCells);
+        }
 
-		cell.isTicked = true;
-	}
+        throw Error("Invalid direction");
+    }
 
-	/**
-	 * Is Cell Ticked
-	 * checks if the cell has been ticked
-	 * @param targetCell
-	 * @returns
-	 */
-	isCellTicked(targetCell: Cell): boolean {
-		return this.grid.find(
-			(c) =>
-				c.gridRow === targetCell.gridRow && c.gridCol === targetCell.gridCol
-		)?.isTicked;
-	}
+    isStartingPointValid(startingPoint: Cell): boolean {
+        try{
+            this.getGridCell(startingPoint.gridRow, startingPoint.gridCol); 
+            return true;
+        }catch{
+            throw Error("starting point not found");
+        }
+    }
 
-	/**
-	 * Occupy Cell
-	 * Mark the cell in use.
-	 * @param cellRange target cell range
-	 */
-	occupyCell(cellRange: Cell[]): void {
-		cellRange.forEach((cell) => {
-			const targetCell = this.getGridCell(cell);
+    getHorizontalRange(startingPoint: Cell, numberOfCells: number) : Cell[]{
 
-			if (targetCell.isInUse) throw Error("cell collision");
+        if(!this.isStartingPointValid(startingPoint)) return;
+        
+        if(numberOfCells <= 0 ) throw Error("Number of cell must be > 0");
 
-			targetCell.isInUse = true;
-		});
-	}
+        const rowIndex = startingPoint.gridRow;
+        const lastColIndex = startingPoint.gridCol + (numberOfCells - 1); // minus 1 to match the array index
+        const cellRange = [];
+        
+        if(lastColIndex > this.cols - 1) throw Error("Range out of bounds");
 
-	/**
-	 * Free Cell
-	 * Mark the cell as NOT in use.
-	 * @param cellRange target cell range
-	 */
-	freeCell(cellRange: Cell[]): void {
-		cellRange.forEach((cell) => {
-			const targetCell = this.getGridCell(cell);
-			targetCell.isInUse = false;
-		});
-	}
+        for( let colIndex = startingPoint.gridCol; colIndex <= lastColIndex ; colIndex++ ){
+            cellRange.push(new Cell(rowIndex, colIndex, this.grid[rowIndex][colIndex]));
+        }
 
-	displayGrid(): void {
-		const gridUI = [];
-		for (let r = 0; r < this.rows; r++) {
-			const row = this.grid
-				.filter((c) => c.gridRow === r)
-				.map((i) => {
-					if (i.isInUse && i.isTicked) return "*";
-					if (i.isInUse) return "#";
-					return "";
-				});
-			gridUI.push(row);
-		}
+        if(cellRange.length !== numberOfCells) throw Error("Range out of bounds");
 
-		// tslint:disable-next-line:no-console
-		console.table(gridUI);
-	}
+        return cellRange;
+    }
+
+    getVerticalRange(startingPoint: Cell, numberOfCells: number) : Cell[]{
+        
+        if(!this.isStartingPointValid(startingPoint)) return;
+        
+        if(numberOfCells <= 0 ) throw Error("Number of cell must be > 0");
+
+        const colIndex = startingPoint.gridCol;
+        const lastRowIndex = startingPoint.gridRow + (numberOfCells - 1); // minus 1 to match the array index
+        const cellRange = [];
+        
+        if(lastRowIndex > this.cols - 1) throw Error("Range out of bounds");
+        
+        for( let rowIndex = startingPoint.gridRow; rowIndex <= lastRowIndex ; rowIndex++ ){
+            cellRange.push(new Cell(rowIndex, colIndex, this.grid[rowIndex][colIndex]));
+        }
+
+        if(cellRange.length !== numberOfCells) throw Error("Range out of bounds");
+
+        return cellRange;
+    }
+
+    /**
+     * Checks if any cell in the range is already occupied
+     * @param cellRange 
+     * @returns boolean
+     */
+    hasCollision(cellRange: Cell[]): boolean {
+        const collision = cellRange.filter(c => c.cellState !== CellState.Open);
+        return collision.length > 0;
+    }
+
+    /**
+     * Updates the cell state to HIT or MISS.
+     * If the cell is occupied, update the cell state to HIT
+     * If the cell is open, update the cell state to MISS
+     * If the cell has been attacked before, return an error.
+     * @param targetCell target cell
+     * @returns the state of the cell after the attack 
+     */
+    attackCell(targetCell: Cell): CellState {
+        const currentCellState = this.getCellState(targetCell.gridRow, targetCell.gridCol);
+        
+        switch (currentCellState) {
+            case CellState.Occupied:
+                targetCell.cellState = CellState.Hit;   
+                break;
+            case CellState.Open:
+                targetCell.cellState = CellState.Miss;   
+                break;
+            default:
+                throw Error("Unable to attack the same cell");
+        }
+
+        this.updateGrid(targetCell);
+        return targetCell.cellState;
+    }
+
+    displayGrid(): void {
+        console.table(this.grid);
+    }
 }

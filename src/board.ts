@@ -149,7 +149,12 @@ export class Board {
 
         throw Error("Invalid direction");
     }
-
+    
+    /**
+     * Checks of the cell starting point valid
+     * @param startingPoint 
+     * @returns 
+     */
     isStartingPointValid(startingPoint: Cell): boolean {
         try{
             this.getGridCell(startingPoint.gridRow, startingPoint.gridCol); 
@@ -159,6 +164,12 @@ export class Board {
         }
     }
 
+    /**
+     * Gets the horizontal cells from the starting point +n number of cells
+     * @param startingPoint starting cell
+     * @param numberOfCells number of cells needed
+     * @returns array of cells
+     */
     getHorizontalRange(startingPoint: Cell, numberOfCells: number) : Cell[]{
 
         if(!this.isStartingPointValid(startingPoint)) return;
@@ -180,6 +191,12 @@ export class Board {
         return cellRange;
     }
 
+    /**
+     * Gets the vertical cells from the starting point +n number of cells
+     * @param startingPoint starting cell
+     * @param numberOfCells number of cells needed
+     * @returns array of cells
+     */
     getVerticalRange(startingPoint: Cell, numberOfCells: number) : Cell[]{
         
         if(!this.isStartingPointValid(startingPoint)) return;

@@ -101,7 +101,11 @@ export class Battleship {
         return isHit;
     }
 
-    checkWinner(){
+    /**
+     * returns the winner, otherwise false
+     * @returns Player 
+     */
+    checkWinner() : Player | null {
         if(!this.player1.hasRemainingShips()){
             return this.player2;
         }

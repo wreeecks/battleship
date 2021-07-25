@@ -37,7 +37,7 @@ export class Ship {
         return this.shipPosition;
     }
     
-    setOrientation(orientation: Direction): void {
+    setShipOrientation(orientation: Direction): void {
         this.shipOrientation = orientation;
     }
 
@@ -45,7 +45,7 @@ export class Ship {
      * 
      * @returns Ship's orientation or direction
      */
-    getOrientation(): Direction {
+    getShipOrientation(): Direction {
         return this.shipOrientation;
     }
 

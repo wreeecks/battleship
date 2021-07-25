@@ -47,7 +47,7 @@ export class Player {
     attack(opponent: Player, cell: Cell): boolean {
         opponent.board.attackCell(cell);
         
-        if(opponent.board.isCellState(cell, CellState.Hit)){
+        if(opponent.board.isCellStateMatch(cell, CellState.Hit)){
             this.setPlayerShipDamage(opponent, cell);         
             return true;    
         }

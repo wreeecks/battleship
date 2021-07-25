@@ -9,10 +9,10 @@ describe("Test Battleship placement and boundaries on a 10x10 Board", () => {
 
 		it("Test set ship orientation to Horizontal", () => {
 			const battleship = new Ship("battle cruiser", 5, Direction.Vertical);
-			battleship.setOrientation(Direction.Horizontal);
+			battleship.setShipOrientation(Direction.Horizontal);
 
-            expect(battleship.getOrientation()).to.not.equal(Direction.Vertical);
-			expect(battleship.getOrientation()).to.equal(Direction.Horizontal);
+            expect(battleship.getShipOrientation()).to.not.equal(Direction.Vertical);
+			expect(battleship.getShipOrientation()).to.equal(Direction.Horizontal);
 		});
 
 		it("Test ship cell consumption - within boundary", () => {
@@ -29,7 +29,7 @@ describe("Test Battleship placement and boundaries on a 10x10 Board", () => {
 			const battleship = new Ship("battle cruiser", 5);
 			const startingPoint = new Cell(0,6);
 
-            expect(() => battleship.getShipCellRangeOnBoard(board, startingPoint)).to.throw(Error, "Range out of bounds");
+            expect(() => battleship.getShipCellRangeOnBoard(board, startingPoint)).to.throw(Error, "Cell range is out range");
 		});
 
 		it("Test ship collistion - overlapping", () => {
@@ -69,10 +69,10 @@ describe("Test Battleship placement and boundaries on a 10x10 Board", () => {
 
 		it("Test set ship orientation to Vertical", () => {
 			const battleship = new Ship("battle cruiser", 5);
-			battleship.setOrientation(Direction.Vertical);
+			battleship.setShipOrientation(Direction.Vertical);
 
-			expect(battleship.getOrientation()).to.not.equal(Direction.Horizontal);
-			expect(battleship.getOrientation()).to.equal(Direction.Vertical);
+			expect(battleship.getShipOrientation()).to.not.equal(Direction.Horizontal);
+			expect(battleship.getShipOrientation()).to.equal(Direction.Vertical);
 		});
 
 		it("Test ship cell consumption - within boundary", () => {
@@ -139,13 +139,13 @@ describe("Test Attack Ship", () => {
 		board.occupyCellRange(shipBoardCells);
 
 		// check targetCell state
-		expect(board.isCellState(targetCell, CellState.Occupied)).to.equal(true);
+		expect(board.isCellStateMatch(targetCell, CellState.Occupied)).to.equal(true);
 
 		// attack ship cell
 		board.attackCell(targetCell);
 
         // check targetCell state
-		expect(board.isCellState(targetCell, CellState.Hit)).to.equal(true);
+		expect(board.isCellStateMatch(targetCell, CellState.Hit)).to.equal(true);
 	});
 
 	it("Attack horizontal battleship - MISS", () => {
@@ -161,7 +161,7 @@ describe("Test Attack Ship", () => {
 		// attack ship cell
 		board.attackCell(targetCell);
 
-		expect(board.isCellState(targetCell, CellState.Miss)).to.equal(true);
+		expect(board.isCellStateMatch(targetCell, CellState.Miss)).to.equal(true);
 	});
 
 	it("Attack vertical battleship - HIT", () => {
@@ -175,13 +175,13 @@ describe("Test Attack Ship", () => {
 		board.occupyCellRange(shipBoardCells);
 
 		// check targetCell
-		expect(board.isCellState(targetCell, CellState.Occupied)).to.equal(true);
+		expect(board.isCellStateMatch(targetCell, CellState.Occupied)).to.equal(true);
 
 		// attack ship cell
 		board.attackCell(targetCell);
 
 		// result
-		expect(board.isCellState(targetCell, CellState.Hit)).to.equal(true);
+		expect(board.isCellStateMatch(targetCell, CellState.Hit)).to.equal(true);
 	});
 
 	it("Attack vertical battleship - MISS", () => {
@@ -197,7 +197,7 @@ describe("Test Attack Ship", () => {
 		// attack ship cell
 		board.attackCell(targetCell);
 
-		expect(board.isCellState(targetCell, CellState.Miss)).to.equal(true);
+		expect(board.isCellStateMatch(targetCell, CellState.Miss)).to.equal(true);
 	});
 
 });

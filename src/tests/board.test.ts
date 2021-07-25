@@ -1,18 +1,19 @@
 import { expect } from "chai";
 import { Board } from "../board";
+import { ActionStatus } from "../interfaces/actionResult";
 import { Cell, CellState } from "../models/cell";
 
 describe("Test Board Creation", () => {
     it("Create a board without setting a size", () => {
        const board = new Board()
-       expect(board.getTotalCols()).to.equal(10);
-       expect(board.getTotalRows()).to.equal(10);
+       expect(board.getRows()).to.equal(10);
+       expect(board.getCols()).to.equal(10);
     });
 
     it("Create a 5x5 board ", () => {
         const board = new Board(5,5);
-        expect(board.getTotalCols()).to.equal(5);
-        expect(board.getTotalRows()).to.equal(5);
+        expect(board.getCols()).to.equal(5);
+        expect(board.getRows()).to.equal(5);
      });
 
      it("Create a 0x0 board ", () => {
@@ -98,7 +99,7 @@ describe("Occupy Board Cells", () => {
 
     it("Occupy a cell in the board", () => {
         board.occupyCell(targetCell);
-        expect(board.isCellState(targetCell, CellState.Occupied)).to.true;
+        expect(board.isCellStateMatch(targetCell, CellState.Occupied)).to.true;
     });
 
     it("Occupying Horizontal cellRage [1,1] - [1-3]", () => {
@@ -149,23 +150,41 @@ describe("Test Board Cell Interactions", () => {
     board.occupyCell(targetCell);
     
     it("Attack an occupied Cell - HIT", () => {
-        expect(board.attackCell(targetCell)).to.equal(CellState.Hit);
-        expect(board.isCellState(targetCell, CellState.Hit)).to.true;
+        expect(board.attackCell(targetCell)).to.be.an('object').to.eql({
+            'status': ActionStatus.Success,
+            'message': CellState[CellState.Hit],
+            'errorName': undefined
+        });
+        expect(board.isCellStateMatch(targetCell, CellState.Hit)).to.true;
+        expect(board.isCellStateMatch(targetCell, CellState.Open)).to.false;
     });
 
     it("Attack an open Cell - MISS", () => {
-        expect(board.attackCell(openCell)).to.equal(CellState.Miss);
-        expect(board.isCellState(openCell, CellState.Miss)).to.true;
-        expect(board.isCellState(openCell, CellState.Open)).to.false;
+        expect(board.attackCell(openCell)).to.be.an('object').to.eql({
+            'status': ActionStatus.Success,
+            'message': CellState[CellState.Miss],
+            'errorName': undefined
+        });
+        expect(board.isCellStateMatch(openCell, CellState.Miss)).to.true;
+        expect(board.isCellStateMatch(openCell, CellState.Open)).to.false;
     });
 
     it("Attack a cell with a MISS state", () => {
-        expect(() => board.attackCell(openCell)).to.throw("Unable to attack the same cell");
-        expect(board.isCellState(openCell, CellState.Miss)).to.true;
+        const x = board.attackCell(openCell);
+        expect(board.attackCell(openCell)).to.be.an('object').to.eql({
+            'status': ActionStatus.Error,
+            'message': 'Unable to update cell',
+            'errorName': 'UnableToUpdateCellError'
+        });
+        expect(board.isCellStateMatch(openCell, CellState.Miss)).to.true;
     });
 
     it("Attack a cell with HIT state", () => {
-        expect(() => board.attackCell(targetCell)).to.throw("Unable to attack the same cell");
-        expect(board.isCellState(targetCell, CellState.Hit)).to.true;
+        expect(board.attackCell(targetCell)).to.be.an('object').to.eql({
+            'status': ActionStatus.Error,
+            'message': 'Unable to update cell',
+            'errorName': 'UnableToUpdateCellError'
+        });
+        expect(board.isCellStateMatch(targetCell, CellState.Hit)).to.true;
     });
 });

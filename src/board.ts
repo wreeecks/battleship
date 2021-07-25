@@ -1,4 +1,7 @@
+import { ActionStatus, Result } from "./interfaces/actionResult";
+import { ActionResult } from "./models/actionResult";
 import { Cell, CellState, Direction } from "./models/cell";
+import { BoardSizeError, CellRangeOutOfRangeError, InvalidCellError, UnableToUpdateCellError } from "./models/errors";
 
 export class Board {
     private rows: number;
@@ -17,15 +20,14 @@ export class Board {
      */
     private setBoardSize(rows: number, cols: number): void {
         if (rows <= 0 || cols <= 0)
-            throw Error("Row and column size must be more than 0");
+            throw new BoardSizeError(rows, cols);
 
         this.rows = rows;
         this.cols = cols;
     }
 
     /**
-     * Create Game Board
-     * This will reset the grid
+     * Creates a multi dimension array cells
      */
     private createBoard(): void {
         const totalRows = this.rows;
@@ -45,21 +47,25 @@ export class Board {
 
 
     /**
-     * Get Total Board Rows
-     * @returns number board's total number of rows
+     * Get the specified number of rows
+     * @returns {number} 
      */
-    getTotalRows(): number {
+    getRows(): number {
         return this.rows;
     }
 
     /**
-     * Get Total Cols
-     * @returns number board's total number of columns
+     * Get the specified number of columns
+     * @returns {number} 
      */
-    getTotalCols(): number {
+    getCols(): number {
         return this.cols;
     }
 
+    /**
+     * Updates a board cell
+     * @param {Cell} cellUpdate cell containing updates
+     */
     private updateGrid(cellUpdate: Cell): void {
         const targetCell = this.getGridCell(cellUpdate.gridRow, cellUpdate.gridCol);
         
@@ -70,7 +76,7 @@ export class Board {
 
     /**
      * If the cell exists, return cell with state.
-     * Otherwise, throw an error "Cell not found".
+     * Otherwise, throw InvalidCellError
      * 
      * @param targetCell target cell
      * @returns Cell
@@ -78,14 +84,14 @@ export class Board {
      getGridCell(row: number, col: number): Cell {
         
         if( typeof this.grid[row] === 'undefined' || typeof this.grid[row][col] === 'undefined')  {
-            throw Error("Cell not found");
+            throw new InvalidCellError(row, col, "Cell not found");
         }
         
         return new Cell(row, col, this.grid[row][col]);
     }
 
     /**
-     * Returns the cell state
+     * Returns the current cell state
      * @param row grid row
      * @param col grid column
      * @returns CellState
@@ -100,7 +106,7 @@ export class Board {
      * @param cellState the state to compare to
      * @returns boolean
      */
-    isCellState(cell: Cell, cellState: CellState): boolean {
+    isCellStateMatch(cell: Cell, cellState: CellState): boolean {
         return this.getCellState(cell.gridRow, cell.gridCol) === cellState;
     }
 
@@ -149,7 +155,7 @@ export class Board {
             this.getGridCell(startingPoint.gridRow, startingPoint.gridCol); 
             return true;
         }catch{
-            throw Error("starting point not found");
+            throw new InvalidCellError(startingPoint.gridRow, startingPoint.gridCol, "starting point not found");
         }
     }
 
@@ -163,13 +169,13 @@ export class Board {
         const lastColIndex = startingPoint.gridCol + (numberOfCells - 1); // minus 1 to match the array index
         const cellRange = [];
         
-        if(lastColIndex > this.cols - 1) throw Error("Range out of bounds");
+        if(lastColIndex > this.cols - 1) throw new CellRangeOutOfRangeError( cellRange, "Range out of bounds");
 
         for( let colIndex = startingPoint.gridCol; colIndex <= lastColIndex ; colIndex++ ){
             cellRange.push(new Cell(rowIndex, colIndex, this.grid[rowIndex][colIndex]));
         }
 
-        if(cellRange.length !== numberOfCells) throw Error("Range out of bounds");
+        if(cellRange.length !== numberOfCells) throw new CellRangeOutOfRangeError( cellRange, "Range out of bounds");
 
         return cellRange;
     }
@@ -184,13 +190,13 @@ export class Board {
         const lastRowIndex = startingPoint.gridRow + (numberOfCells - 1); // minus 1 to match the array index
         const cellRange = [];
         
-        if(lastRowIndex > this.cols - 1) throw Error("Range out of bounds");
+        if(lastRowIndex > this.cols - 1) throw new InvalidCellError( startingPoint.gridRow, startingPoint.gridCol, "Range out of bounds");
         
         for( let rowIndex = startingPoint.gridRow; rowIndex <= lastRowIndex ; rowIndex++ ){
             cellRange.push(new Cell(rowIndex, colIndex, this.grid[rowIndex][colIndex]));
         }
 
-        if(cellRange.length !== numberOfCells) throw Error("Range out of bounds");
+        if(cellRange.length !== numberOfCells) throw new CellRangeOutOfRangeError(cellRange, "Range out of bounds");
 
         return cellRange;
     }
@@ -213,7 +219,7 @@ export class Board {
      * @param targetCell target cell
      * @returns the state of the cell after the attack 
      */
-    attackCell(targetCell: Cell): CellState {
+    attackCell(targetCell: Cell): Result {
         const currentCellState = this.getCellState(targetCell.gridRow, targetCell.gridCol);
         
         switch (currentCellState) {
@@ -224,11 +230,12 @@ export class Board {
                 targetCell.cellState = CellState.Miss;   
                 break;
             default:
-                throw Error("Unable to attack the same cell");
+                const error = new UnableToUpdateCellError(targetCell);
+                return new ActionResult(ActionStatus.Error, error.message, error.name );    
         }
 
         this.updateGrid(targetCell);
-        return targetCell.cellState;
+        return new ActionResult(ActionStatus.Success, CellState[targetCell.cellState ]);
     }
 
     displayGrid(): void {

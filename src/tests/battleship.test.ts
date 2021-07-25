@@ -15,7 +15,7 @@ describe('Game Play', () => {
     const player2Ships = player2.getShips();
 
     // change orientation
-    player2Ships[0].setOrientation(Direction.Vertical);
+    player2Ships[0].setShipOrientation(Direction.Vertical);
 
     // position ships
     bs.placeShip(player1, player1Ships[0],  new Cell(0,0));

@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import { Battleship } from '../battleship';
+import { ActionStatus, Result } from '../interfaces/result';
 import { Cell, Direction } from '../models/cell';
 
 describe('Game Play', () => {
-
     const bs = new Battleship();
     bs.start();
 
@@ -33,7 +33,6 @@ describe('Game Play', () => {
         // p2 hits p1 ship
         expect(bs.attackPlayer(player2, player1, new Cell(0,0))).to.equal(true);
         
-
         // ship damaged but not yet destroyed
         expect(player2Ships[0].isDestroyed()).to.equal(false);
 

@@ -1,4 +1,4 @@
-import { ActionStatus, Result } from "./interfaces/actionResult";
+import { ActionStatus, Result } from "./interfaces/result";
 import { ActionResult } from "./models/actionResult";
 import { Cell, CellState, Direction } from "./models/cell";
 import { BoardSizeError, CellRangeOutOfRangeError, InvalidCellError, UnableToUpdateCellError } from "./models/errors";

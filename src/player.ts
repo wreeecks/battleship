@@ -49,8 +49,12 @@ export class Player {
         
         if(opponent.board.isCellStateMatch(cell, CellState.Hit)){
             this.setPlayerShipDamage(opponent, cell);         
+            // tslint:disable-next-line:no-console
+            console.log("HIT!");
             return true;    
         }
+         // tslint:disable-next-line:no-console
+         console.log("MISS!")
         return false;
     }
 

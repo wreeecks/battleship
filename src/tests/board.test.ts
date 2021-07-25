@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { Board } from "../board";
-import { ActionStatus } from "../interfaces/actionResult";
+import { ActionStatus } from "../interfaces/result";
 import { Cell, CellState } from "../models/cell";
 
 describe("Test Board Creation", () => {

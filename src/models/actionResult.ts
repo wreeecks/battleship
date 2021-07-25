@@ -1,4 +1,4 @@
-import { ActionStatus, Result } from "../interfaces/actionResult";
+import { ActionStatus, Result } from "../interfaces/result";
 
 export class ActionResult implements Result {
     status: ActionStatus;

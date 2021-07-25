@@ -54,14 +54,11 @@ export class Ship {
      * @param cell 
      */
     setShipDamage(cell: Cell): void {
-        
         const ship = this.shipPosition.find(c => c.gridRow === cell.gridRow && c.gridCol === cell.gridCol);
         
         if(!ship) throw("Unable to set damage.");
 
         if(ship){
-            // tslint:disable-next-line:no-console
-            console.log("HIT!")
             ship.cellState = CellState.Hit;
 
             if(this.isDestroyed()){
